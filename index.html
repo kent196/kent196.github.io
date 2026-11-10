@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vu Trieu Duong</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: single column "build log" — HUD stat strip up top, shipped titles as cartridges, timeline per studio */
+:root {
+  --bg: #eef1f6;
+  --surface: #ffffff;
+  --fg: #141a26;
+  --muted: #5a6478;
+  --line: #d5dbe6;
+  --accent: #2f5bea;
+  --amber: #c27a00;
+  --display: "Chakra Petch", "Trebuchet MS", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1320; --surface: #161d2e; --fg: #e6eaf2; --muted: #98a2b8;
+    --line: #273149; --accent: #7c9bff; --amber: #ffb84d; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1320; --surface: #161d2e; --fg: #e6eaf2; --muted: #98a2b8;
+  --line: #273149; --accent: #7c9bff; --amber: #ffb84d; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0;
+  background: var(--bg); color: var(--fg);
+  font: 16px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 56px 72px; display: grid; gap: 64px; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.15; }
+.label { font: 600 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+/* hero */
+header { display: grid; gap: 20px; }
+.role { font: 600 13px/1 var(--mono); letter-spacing: .1em; color: var(--accent); text-transform: uppercase; }
+h1 { font-size: clamp(40px, 8vw, 72px); font-weight: 700; letter-spacing: -.01em; }
+.summary { max-width: 62ch; font-size: 18px; color: var(--muted); margin: 0; }
+.contact { display: flex; flex-wrap: wrap; gap: 10px 24px; font: 14px/1.4 var(--mono); align-items: center; }
+.contact span { color: var(--fg); user-select: all; }
+.copy {
+  font: 600 12px/1 var(--mono); padding: 6px 10px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg);
+}
+.copy:hover { border-color: var(--accent); }
+
+/* HUD stats */
+.hud { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.stat { padding: 18px 20px; display: grid; gap: 6px; border-left: 1px solid var(--line); min-width: 0; }
+.stat:first-child { border-left: 0; }
+.stat b { font: 700 28px/1 var(--display); font-variant-numeric: tabular-nums; color: var(--amber); }
+.stat small { font-size: 13px; color: var(--muted); line-height: 1.35; }
+@media (max-width: 640px) {
+  .hud { grid-template-columns: 1fr 1fr; }
+  .stat:nth-child(3) { border-left: 0; }
+  .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+}
+
+section { display: grid; gap: 24px; }
+section > h2 { font-size: 26px; font-weight: 700; display: flex; align-items: baseline; gap: 14px; }
+section > h2::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+/* jobs */
+.job { display: grid; grid-template-columns: 150px 1fr; gap: 8px 32px; }
+.job + .job { padding-top: 40px; border-top: 1px dashed var(--line); }
+.when { font: 13px/1.5 var(--mono); color: var(--muted); padding-top: 6px; font-variant-numeric: tabular-nums; }
+.job-body { display: grid; gap: 14px; min-width: 0; }
+.job h3 { font-size: 22px; }
+.where { color: var(--muted); font-size: 15px; margin-top: -8px; }
+.job p { margin: 0; max-width: 64ch; }
+.games { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 6px; }
+.game { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.game header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.game h4 { margin: 0; font: 700 17px/1.25 var(--display); }
+.game a { font: 600 12px/1 var(--mono); white-space: nowrap; text-decoration: none; }
+.game a:hover { text-decoration: underline; }
+.game ul { margin: 0; padding-left: 18px; font-size: 14.5px; color: var(--muted); display: grid; gap: 4px; }
+.game li strong { color: var(--fg); font-weight: 600; }
+@media (max-width: 640px) { .job { grid-template-columns: 1fr; } .when { padding-top: 0; } }
+
+/* skills */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 14px/1 var(--mono); padding: 9px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+@media (max-width: 640px) { .two { grid-template-columns: 1fr; } }
+.edu { display: grid; gap: 4px; }
+.edu strong { font-family: var(--display); font-size: 18px; }
+.edu span { color: var(--muted); font-size: 15px; }
+.lang { display: flex; align-items: center; gap: 14px; }
+.pips { display: flex; gap: 4px; }
+.pips i { width: 22px; height: 8px; border-radius: 2px; background: var(--accent); }
+.pips i.off { background: var(--line); }
+
+footer { font: 13px/1.5 var(--mono); color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="role">Unity Game Developer · Ho Chi Minh City</div>
+    <h1>Vu Trieu Duong</h1>
+    <p class="summary">I build and ship casual mobile games in Unity and C#. For 2+ years I've worked on gameplay systems, level design, performance, ad monetization, and LiveOps for live titles on Google Play.</p>
+    <div class="contact">
+      <span id="email">kentdev196@gmail.com</span>
+      <button class="copy" id="copy-email" type="button">Copy email</button>
+      <span>+84 395 019 607</span>
+      <a href="https://github.com/kent196" target="_blank" rel="noopener">github.com/kent196</a>
+      <a href="https://www.linkedin.com/in/kentdev196/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </header>
+
+  <div class="hud" aria-label="Highlights">
+    <div class="stat"><b>10M+</b><small>combined downloads at Pentoro Studio</small></div>
+    <div class="stat"><b>60 FPS</b><small>stable, after draw-call and texture work</small></div>
+    <div class="stat"><b>13→20%</b><small>Day-1 retention on Sudoku Premier</small></div>
+    <div class="stat"><b>6</b><small>titles shipped and maintained on Google Play</small></div>
+  </div>
+
+  <section>
+    <h2>Experience</h2>
+
+    <div class="job">
+      <div class="when">Aug 2025 –<br>Present</div>
+      <div class="job-body">
+        <h3>Game Developer</h3>
+        <div class="where">Infinez Studio · Ho Chi Minh City</div>
+        <p>I develop and maintain casual mobile games, focusing on gameplay systems, performance, ad monetization, and LiveOps features. I work with designers, artists, and producers on live products.</p>
+        <div class="games">
+          <article class="game">
+            <header><h4>Goods Hunt – Hole It All</h4><a href="https://play.google.com/store/search?q=Goods%20Hunt%20Hole%20It%20All&c=apps" target="_blank" rel="noopener">Google Play ↗</a></header>
+            <ul>
+              <li>Ran <strong>LiveOps events</strong> to lift engagement and retention</li>
+              <li>Hit a stable <strong>60 FPS</strong> by cutting UI draw calls, textures, and 3D vertex counts</li>
+              <li>Integrated interstitial, rewarded, and banner ads, plus in-game billboards via <strong>Adverty</strong> and <strong>Gadsme</strong></li>
+              <li>Cut build size and load times with <strong>Addressables</strong> and AssetBundles</li>
+              <li>Tracked crash-free rate in <strong>Firebase</strong> and fixed stability issues</li>
+            </ul>
+          </article>
+          <article class="game">
+            <header><h4>Block Slider: Color Jam</h4><a href="https://play.google.com/store/search?q=Block%20Slider%20Color%20Jam&c=apps" target="_blank" rel="noopener">Google Play ↗</a></header>
+            <ul>
+              <li>Built new gameplay mechanics and onboarding tutorials</li>
+              <li>Tuned gameplay flow and difficulty with the design team</li>
+            </ul>
+          </article>
+          <article class="game">
+            <header><h4>Sort Em! Triple Goods</h4><a href="https://play.google.com/store/search?q=Sort%20Em%20Triple%20Goods&c=apps" target="_blank" rel="noopener">Google Play ↗</a></header>
+            <ul>
+              <li>Maintained interstitial, rewarded, and banner ad systems</li>
+              <li>Integrated <strong>Spine</strong> animations for visual polish and player feedback</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="when">Mar 2024 –<br>May 2025</div>
+      <div class="job-body">
+        <h3>Game Developer</h3>
+        <div class="where">Pentoro Studio · Ho Chi Minh City</div>
+        <p>I developed and launched mobile games with a combined <strong>10M+ downloads</strong>, covering gameplay systems, optimization, and monetization. I worked with designers, artists, and product teams on engagement, retention, and revenue.</p>
+        <div class="games">
+          <article class="game">
+            <header><h4>Sudoku Premier</h4><a href="https://play.google.com/store/search?q=Sudoku%20Premier&c=apps" target="_blank" rel="noopener">Google Play ↗</a></header>
+            <ul>
+              <li>Built the game from scratch: core gameplay and support systems</li>
+              <li>Developed puzzle logic and progression systems</li>
+              <li>Raised <strong>Day-1 retention from 13% to 20%</strong> through gameplay and balancing changes</li>
+            </ul>
+          </article>
+          <article class="game">
+            <header><h4>NumMatch</h4><a href="https://play.google.com/store/search?q=NumMatch&c=apps" target="_blank" rel="noopener">Google Play ↗</a></header>
+            <ul>
+              <li>Reached a stable <strong>60 FPS</strong> by optimizing UI rendering and draw calls</li>
+              <li>Shrank textures to cut build size and memory use</li>
+              <li>Found bottlenecks with the <strong>Unity Profiler</strong></li>
+              <li>Shipped new features and worked with animators on polish</li>
+            </ul>
+          </article>
+          <article class="game">
+            <header><h4>Nuts Island</h4><a href="https://play.google.com/store/search?q=Nuts%20Island&c=apps" target="_blank" rel="noopener">Google Play ↗</a></header>
+            <ul>
+              <li>Fixed <strong>ads and IAP</strong> integration issues</li>
+              <li>Built new mechanics and booster systems</li>
+              <li>Improved stability through bug fixes</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Skills</h2>
+    <div class="chips">
+      <span class="chip">Unity 2D / 3D</span><span class="chip">C#</span><span class="chip">Gameplay Programming</span>
+      <span class="chip">Game Optimization</span><span class="chip">Performance Profiling</span><span class="chip">Unity Profiler</span>
+      <span class="chip">Addressables</span><span class="chip">AssetBundles</span><span class="chip">In-game Ads</span>
+      <span class="chip">UI/UX Integration</span><span class="chip">Game Animation</span><span class="chip">Spine</span>
+      <span class="chip">Firebase</span><span class="chip">Git</span><span class="chip">Rider</span>
+      <span class="chip">Visual Studio</span><span class="chip">Agile / Scrum</span>
+    </div>
+  </section>
+
+  <div class="two">
+    <section>
+      <h2>Education</h2>
+      <div class="edu">
+        <strong>FPT University</strong>
+        <span>Bachelor of Software Engineering</span>
+        <span>Jan 2020 – Jan 2023 · GPA 7.65 / 10</span>
+      </div>
+    </section>
+    <section>
+      <h2>Languages</h2>
+      <div class="lang">
+        <span>English</span>
+        <div class="pips" aria-label="4 out of 5"><i></i><i></i><i></i><i></i><i class="off"></i></div>
+      </div>
+    </section>
+  </div>
+
+  <footer>© 2026 Vu Trieu Duong · Built with Unity energy, shipped as HTML.</footer>
+</div>
+
+<script>
+document.getElementById('copy-email').addEventListener('click', async (e) => {
+  const btn = e.currentTarget, text = document.getElementById('email').textContent;
+  try { await navigator.clipboard.writeText(text); btn.textContent = 'Copied'; }
+  catch { const r = document.createRange(); r.selectNodeContents(document.getElementById('email')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected'; }
+  setTimeout(() => btn.textContent = 'Copy email', 1600);
+});
+</script>
+</body>
+</html>
